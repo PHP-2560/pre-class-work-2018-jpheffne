@@ -1,5 +1,6 @@
 # pre-class
 
+**IMPORTANT** I added a RMD file as my completed assignment for pre-class week 2. I chose to add a RMD because I wanted to have the option to knit R code in alongside the assignment and I couldn't figure out how to (or if it's possible) to knit markdown only files. 
 
 This folder contains your first pre-class assignment. Remember to complete the flipped material first:
 
