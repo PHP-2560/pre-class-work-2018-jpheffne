@@ -1,0 +1,160 @@
+---
+title: "preclass Week2"
+author: "Joey Heffner"
+date: "September 18, 2018"
+output: html_document
+---
+
+# pre-class
+
+Make sure you commit this often with meaningfull messages. 
+
+### Background
+
+The exponential distribution is defined by its cumulative distribution function
+\(F(x) = 1-e^{-\lambda x}\)
+
+The R function ***rexp()*** generates random variables with an exponential distribution. For example 
+<center><strong>rexp(n=10, rate=5)</strong> </center>
+
+results in 10 exponentially distributed numbers with a rate \(\lambda=5\). If you leave out the 5 and just have
+<center><strong>rexp(n=10) </strong></center>
+then this results in 10 exponentially distributed numbers with a rate \(\lambda=1\), this is also referred to as the "standard exponential distribution". 
+
+### Part 1
+
+
+1. Generate 200 random values from the standard exponential distribution and store them in a vector `exp.draws.1`.  Find the mean and standard deviation of `exp.draws.1`.
+
+```{r echo = TRUE} 
+exp.draws.1 <- rexp(n = 200, rate = 1)
+mean(exp.draws.1) 
+sd(exp.draws.1)
+```
+
+2. Repeat, but change the rate to 0.2, 5, 7.3 and 10, storing the results in vectors called  `exp.draws.0.2`,  `exp.draws.5`,  `exp.draws.7.3` and  `exp.draws.10`. 
+
+```{r echo = TRUE} 
+exp.draws.0.2 <- rexp(n = 200, rate = .2)
+mean(exp.draws.0.2) 
+sd(exp.draws.0.2)
+
+exp.draws.5 <- rexp(n = 200, rate = 5)
+mean(exp.draws.5) 
+sd(exp.draws.5)
+
+exp.draws.7.3 <- rexp(n = 200, rate = 7.3)
+mean(exp.draws.7.3) 
+sd(exp.draws.7.3)
+
+exp.draws.10 <- rexp(n = 200, rate = 10)
+mean(exp.draws.10) 
+sd(exp.draws.10)
+
+```
+
+3. The function `plot()` is the generic function in R for the visual display of data. `hist()` is a function that takes in and bins data as a side effect. To use this function, we must first specify what we'd like to plot.
+    a. Use the `hist()` function to produce a histogram of your standard exponential distribution. 
+    
+    ``` {r echo = TRUE}
+    hist(exp.draws.1)
+    ```
+    
+    b. Use `plot()` with this vector to display the random values from your standard distribution in order.
+    
+    ``` {r echo = TRUE}
+    # descending order
+    plot(sort(exp.draws.1, decreasing = TRUE))
+    
+    ```
+    
+    c. Now, use `plot()` with two arguments -- any two of your other stored random value vectors -- to create a scatterplot of the two vectors against each other.
+    
+    ``` {r echo = TRUE}
+    plot(exp.draws.1, exp.draws.10)
+    ```
+
+4. We'd now like to compare the properties of each of our vectors. Begin by creating a vector of the means of each of our five distributions in the order we created them and saving this to a variable name of your choice. Using this and other similar vectors, create the following scatterplots and explain in words what is going on:
+
+    ``` {r echo = TRUE} 
+    exp.means <- c(mean(exp.draws.0.2), mean(exp.draws.1), mean(exp.draws.5), mean(exp.draws.7.3), mean(exp.draws.10))
+    exp.sds <- c(sd(exp.draws.0.2), sd(exp.draws.1), sd(exp.draws.5), sd(exp.draws.7.3), sd(exp.draws.10))
+    exp.rates <- c(0.2, 1, 5, 7.3, 10)
+    ```
+
+    a. The five means versus the five rates used to generate the distribution.
+    
+    **ANSWER.** The plot shows the exponential relationship expressed by the lambda rate (x-axis) and the average of the exponential distribution (y-axis). Demonstrates that for higher lambdas (e.g., 7.3), the distribution shifts overall to the left and places more probability mass on lower values of x. This results in a more left skewed distribution and thus the average of the distribution is lower. For lower lambdas (e.g., 1), the distribution begins to place more probability mass on higher values of x and shifts the average higher. 
+    
+    ``` {r echo = TRUE}
+    plot(exp.rates, exp.means)
+    ```
+    
+    b. The standard deviations versus the rates.
+    
+    ** ANSWER. ** The plot shows the same exponential relationship and demonstrates that higher lambdas also have smaller sds, indicating a more peaked probability distribution. Lower lambdas have larger sds and indicates a more flat probability distribution.
+    
+    ``` {r echo = TRUE}
+    plot(exp.rates, exp.sds)
+    ```
+    
+    c. The means versus the standard deviations.
+    
+    **ANSWER.** The plot shows a linear relationship between the mean and sd of the expotential distributions. The mean of the distribution is effectively given by 1 / lambda while the variance is effectively given by 1 / lambda ^ 2; therefore the standard deviation is the square root of the variance and equal to the mean. 
+    
+    ``` {r echo = TRUE} 
+    plot(exp.means, exp.sds)
+    ```
+
+For each plot, explain in words what's going on.
+
+### Part II (PHP 2560 Only)
+
+
+5. R's capacity for data and computation is large to what was available 10 years ago. 
+    a. To show this, generate 1.1 million numbers from the standard exponential distribution and store them in a vector called `big.exp.draws.1`. Calculate the mean and standard deviation.
+    
+    ``` {r echo = TRUE}
+    big.exp.draws.1 <- rexp(1100000, rate = 1) # standard exp dist
+    mean(big.exp.draws.1)
+    sd(big.exp.draws.1)
+    ```
+    
+    b. Plot a histogram of `big.exp.draws.1`.  Does it match the function \(1-e^{-x}\)?  Should it? 
+    
+    **ANSWER.** It doesn't match the cumulative distribution function because high values of x (e.g., 10,000) should equal 1 which represents the lambda asympotote. The histogram "big.exp.draws.1" represents the probability density function of the exponential function, which gives the probability of sampling a value of x for each x.  
+    
+    ``` {r echo = TRUE} 
+    hist(big.exp.draws.1) 
+    ```
+    
+    c. Find the mean of all of the entries in `big.exp.draws.1` which are strictly greater than 1. You may need to first create a new vector to identify which elements satisfy this.
+    
+    ``` {r echo = TRUE}
+    large.exp.draws <- big.exp.draws.1[big.exp.draws.1 > 1]
+    mean(large.exp.draws)
+    ```
+    
+    d. Create a matrix, `big.exp.draws.1.mat`, containing the the values in 
+`big.exp.draws.1`, with 1100 rows and 1000 columns. Use this matrix as the input to the `hist()` function and save the result to a variable of your choice. What happens to your data?
+
+    **ANSWER.** Data looks the same because the histogram simply bins all values and plots them according to their count. Could shuffle the matrix and it would look the same. 
+
+    ``` {r echo = TRUE}
+    big.exp.draws.1.mat <- matrix(big.exp.draws.1, nrow = 1100, ncol = 1000) 
+    hist(big.exp.draws.1.mat)
+    ```
+  
+    e. Calculate the mean of the 371st column of `big.exp.draws.1.mat`.
+    ``` {r echo = TRUE}
+    mean(big.exp.draws.1.mat[, 371])
+    ```
+    
+    f. Now, find the means of all 1000 columns of `big.exp.draws.1.mat` simultaneously. Plot the histogram of column means.  Explain why its shape does not match the histogram in problem 5b).
+    
+    **ANSWER.** The shape shouldn't match the histogram in problem 5b because those were individually sampled values of the exponential distribution. By making a matrix with 1,000 columns, we essentially created 1,000 mini "samples" of 1,100 observations (rows) and calculated the mean of these samples. What results is a normal distribution where the means of each of the samples are centered around 1 (the mean of the exponential distribution) and there's enough variance that some means will be higher or lower than 1 but this should be normally distributed. 
+   
+    ``` {r echo = TRUE}
+    col.means <- apply(big.exp.draws.1.mat, 2, mean) # 2 specifies the 2nd dimension, columns
+    hist(col.means)
+    ```

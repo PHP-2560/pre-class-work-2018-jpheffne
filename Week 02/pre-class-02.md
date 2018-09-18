@@ -1,3 +1,9 @@
+--- 
+title: "pre-class Week 2"
+author: "Joey Heffner"
+output: html_document
+---
+
 # pre-class
 
 
@@ -19,6 +25,18 @@ then this results in 10 exponentially distributed numbers with a rate \(\lambda=
 
 
 1. Generate 200 random values from the standard exponential distribution and store them in a vector `exp.draws.1`.  Find the mean and standard deviation of `exp.draws.1`.
+
+**PROBLEM.** I couldn't figure out how to get markdown to knit R code like RMD does (unsure whether MD can do this at all or if it's something with GitHub.) Will continue to investigate but for the time being I simply made a RMD titled "pre-class-02-RMD.Rmd"
+
+`r exp.draws.1 <- rexp(n = 200, rate = 1)` 
+`r mean(exp.draws.1)`
+`r sd(exp.draws.1)`
+
+```{r echo = FALSE} 
+exp.draws.1 <- rexp(n = 200, rate = 1)
+mean(exp.draws.1) 
+sd(exp.draws.1)
+```
 
 2. Repeat, but change the rate to 0.2, 5, 7.3 and 10, storing the results in vectors called  `exp.draws.0.2`,  `exp.draws.5`,  `exp.draws.7.3` and  `exp.draws.10`. 
 
