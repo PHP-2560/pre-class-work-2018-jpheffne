@@ -1,22 +1,45 @@
 # pre-class
 
-
 Make sure you commit this often with meaningful messages. 
-
-
-
 
 ### Question 1:
 
 Using a loop, print the integers from 1 to 50. 
 
+``` {r echo = TRUE}
+for (i in 1:50) {
+  print(i)
+}
+```
+
 ### Question 2:
 
 A.  Using a loop, add all the integers between 0 and 1000.
 
+``` {r echo = TRUE}
+finalSum <- 0 # initalize a counter 
+for (i in 0:1000) {
+  finalSum <- finalSum + i
+}
+finalSum
+```
+
 B. Now, add all the EVEN integers between 0 and 1000 (hint: use seq())
 
+``` {r echo = TRUE}
+finalSum2 <- 0
+for (i in seq(0, 1000, by = 2)) {
+  finalSum2 <- finalSum2 + i
+} 
+finalSum2
+```
+
 C. Now, repeat A and B WITHOUT using a loop.
+
+``` {r echo = TRUE}
+sum(seq(0, 1000))
+sum(seq(0, 1000, by = 2))
+```
 
 ### Question 3:
 
@@ -36,4 +59,25 @@ The response to each question should be an integer between 1 and 5. Obviously, w
 
 A. Using a loop, create a new dataframe called survey.clean where all the invalid values (those that are not integers between 1 and 5) are set to NA.
 
+``` {r echo = TRUE} 
+survey.clean <- survey # I prefer to just iterate through the matrix / df
+for (i in 1:nrow(survey)) { # goes through number of rows
+  for (j in 2:ncol(survey)) { # goes through number of cols (ignoring participant column)
+    if (survey.clean[i, j] >= 1 & survey.clean[i, j] <=5) {
+      next
+    } else
+      survey.clean[i,j] <- NA
+  }
+}
+survey.clean
+```
+
 B. Now, again using a loop, add a new column to the dataframe called "invalid.answers" that indicates, for each participant, how many bad answers they gave.
+
+``` {r echo = TRUE}
+library(dplyr)
+# Note I'm adding the new column to survey.clean since it's easier to count NAs
+survey.clean %>%
+  group_by(participant) %>%
+  mutate(invalid.answers = sum(is.na(c(q1, q2, q3, q4, q5))))
+```
