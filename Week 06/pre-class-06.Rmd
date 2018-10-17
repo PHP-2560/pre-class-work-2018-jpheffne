@@ -1,0 +1,97 @@
+# pre-class
+
+
+Make sure you commit this often with meaningful messages. 
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1. Read the source code for each of the following three functions, puzzle out what they do, and then brainstorm better names.
+
+``` {r echo = TRUE}
+# prefix_exists function takes a string & prefix and returns TRUE if prefix exists in string, FALSE otherwise
+prefix_exists <- function(string, prefix) { # input arguments are a string (e.g., "precommitment") and a prefix (e.g., "pre") 
+  substr(string, 1, nchar(prefix)) == prefix # substr extracts or replaces substrings in a character vector; returns a boolean value
+}
+
+# remove_last function takes a vector and deletes the last element (unless vector only has one value) 
+remove_last <- function(x) { # input x, typically a vector
+  if (length(x) <= 1) return(NULL) # check if length of vector x is less than or equal to 1 and if so returns NULL
+  x[-length(x)] # otherwise deletes last element in vector x
+}
+
+# rep_vec function takes two vectors and repeats the 2nd vector until it reaches the length of the first vector 
+# difficult to come up with a name since it's essential the same as rep 
+rep_vec <- function(x, y) { # input x and y, typically vectors 
+  rep(y, length.out = length(x)) # replicates the values in y for the desired length of the output vector (length.out)
+}
+```
+
+2. Compare and contrast rnorm() and MASS::mvrnorm(). How could you make them more consistent?
+
+``` {r echo = TRUE}
+# Testing rnorm() 
+rnorm_sample <- rnorm(n = 1000, mean = 3, sd = 11) # creates  random numbers generated from a normal distribution 
+
+# Testing MASS::mvrnorm() 
+mvrnorm_sample <- MASS::mvrnorm(n = 1000, mu = 3, Sigma = 11) # simulates one or more samples from a specified multivariate normal distribution 
+
+hist(rnorm_sample)
+hist(mvrnorm_sample[,1])
+
+# Comparing rnorm() and MASS::mvrnorm()
+# rnorm() generates _univariate_ sample and uses the single sd for the spread of the normal distribution 
+# rnorm() defaults mean to 0 and sd to 1
+
+# MASS::mvrnorm() generates _multivariate_ samples and uses the variance-covariance matrix (Sigma) for the spread. If this was the univariate case, Sigma would simply equal the variance 
+# MASS:mvrnorm() requires mu and Sigma to be specified 
+# MASS:mvrnorm() mu is a vector of the means while Sigma is matrix
+# MASS returns a list while rnorm returns a vector 
+
+# To make more consistant, you might want the mvrnorm to be able to generate univariate noraml distributions (like rnorm) but I'm not positive why Sigma is able to take a scalar and convert it to a matrix (a matrix of 1 x 1 can qualify as positive definite but seems unusual). 
+# I would incorporate rnorm into mvrnorm by adding an additional argument that specified the number of univariate normal distributions you want to sample over. If this value is 1, then mvrnorm could default the values mu to be mean and Sigma to be sd, but this would involve also checking that the Sigma was a scalar (and not automatically converting it to a covariance matrix). 
+```
+
+3. Use `lapply()` and an anonymous function to find the coefficient of variation (the standard deviation divided by the mean) for all columns in the mtcars dataset. 
+
+``` {r echo = TRUE} 
+head(mtcars)
+
+lapply(mtcars, function(x) {sd(x) / mean(x)})
+```
+
+4. Use vapply() to:
+    a. Compute the standard deviation of every column in a numeric data frame.
+    
+    ``` {r echo = TRUE} 
+    # Unclear whether to make a function or not but I'll write one for a generic numeric data frame
+    
+    sd_cols <- function(df) {
+      vapply(df, sd, numeric(1)) # specify output
+    }
+    
+    sdCols(mtcars)
+    ```
+    b. Compute the standard deviation of every numeric column in a mixed data frame. (Hint: you’ll need to use vapply() twice.)
+    
+    ``` {r echo = TRUE} 
+    mixed_df <- data.frame("V1" = 1:2, "V2" = c(21,15), "Name" = c("John","Dora"))
+    
+    sd_cols_mixed <- function(df) {
+    
+      # First vapply() is used to select only the numeric cols in mixed_df
+      numeric_index <- vapply(df, is.numeric, logical(1))
+      
+      # Second vapply() is used to compute the sd like before, this time on only the numeric columns of df
+      vapply(df[numeric_index], sd, numeric(1))
+      
+    }
+    
+    #vapply(mixed_df, sd, numeric(1)) # throws an error because Name is a factor
+  
+    sd_cols_mixed(mixed_df)
+    ```
