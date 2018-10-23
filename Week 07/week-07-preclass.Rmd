@@ -31,12 +31,94 @@ With this project we will simulate a famoues probability problem. This will not 
 
  1. **Gambler's Ruin**: Suppose you have a bankroll of $1000 and make bets of $100 on a fair game. By simulating the outcome directly for at most 5000 iterations of the game (or hands), estimate:
     a. the probability that you have "busted" (lost all your money) by the time you have placed your one hundredth bet. 
+    **ANSWER** 8.74%
     b. the probability that you have busted by the time you have placed your five hundredth bet by simulating the outcome directly. 
+    **ANSWER** 42.3%
     c. the mean time you go bust, given that you go bust within the first 5000 hands.
+    **ANSWER** On average our player goes "bust" on the 505th hand (conditional on busting within first 5,000 hands)
     d. the mean and variance of your bankroll after 100 hands (including busts).
+    **NOTE** This question requires _so_ much data to be retained (if you want to output the results) that I feel my approach may have been incorrect but here's my answer.
+    **ANSWER** The mean bankroll after 100 hands (making busts = 0), is 211 hands while the sd of the bankrolls is 546!
     e. the mean and variance of your bankroll after 500 hands (including busts).
+    **ANSWER** The mean is 90.6 and sd is 383. 
  
 Note: you *must* stop playing if your player has gone bust. How will you handle this in the `for` loop?
+
+``` {r echo = TRUE} 
+# First attempt to simulate the Gambler's Ruin 
+# Seems like we want to use a binomial distribution, since we have "n" independent trials where the result is either success (you won) or failure (you lost), according to a constant probability of success. This is NOT yet a Markov Chain since you do not change your strategy depending on wins / losses
+
+set.seed(1) # for reproducibility
+
+initialBankroll <- 1000 # start with $1,000 but will increment this
+bet <- 100 # always bet $100 
+pSuccess <- .5 # I assume a "fair" games means 50% chance to win 
+numIteractions <- 5000 # could change for other simulations
+
+gamblerSimulation <- function(initialBankroll = 1000, bet = 100, pSuccess = .5, numIteractions = 5000) {
+
+  bankrollHistory <- rep(NA, numIteractions) # create a bankroll History
+  bankrollHistory[1] <- initialBankroll # set beginning bankroll 
+  
+  for (i in 1:numIteractions) { # i is the "hand" the game is on (first, second, etc.)
+    
+    # Check whether our player can even play the game! 
+    if (bankrollHistory[i] < 100) { # Our player doesn't have enough money to play
+      output <- list("Bust", i, bankrollHistory)
+      return(output)
+    } else { # our player does have enough money to play 
+      # Have our player play the hand with a 50% probability of winning 
+      trialSuccess <- rbinom(1, 1, p = pSuccess) # I want to sample 1 pull 1 time, with a probability of 50% of a 1 or 0
+      
+      if (trialSuccess == 1) { # won!
+        bankrollHistory[i+1] <- bankrollHistory[i] + bet 
+      } else { # lost
+        bankrollHistory[i+1] <- bankrollHistory[i] - bet
+      }
+    }
+  }
+  output <- list("Not Bust", i, bankrollHistory)
+  return(output)
+}
+
+# Simulate 5,000 versions of the game (with max 5,000 hands) 
+simulations <- replicate(numIteractions, gamblerSimulation())
+
+# To answer the first three questions easily, I'll extract only the "Bust" and "Hand" variables from the list simulations (leaving the Bankroll variable for later)
+simulationsReshaped <- data.frame(matrix(unlist(simulations[1:2,]), nrow = numIteractions, byrow = T))
+
+colnames(simulationsReshaped) <- c("Busted", "Hand", "Bankroll")
+simulationsReshaped$Hand <- as.numeric(simulationsReshaped$Hand)
+simulationsReshaped$Bankroll <- as.numeric(simulationsReshaped$Bankroll)
+
+## Answering subquestions 
+library(dplyr)
+answerA <- simulationsReshaped %>%
+  filter((Busted == "Bust" & Hand <= 100)) %>%
+  summarise(finalAnswer = n() / numIteractions * 100)
+
+answerB <- simulationsReshaped %>%
+  filter((Busted == "Bust" & Hand <= 500)) %>%
+  summarise(finalAnswer = n() / numIteractions * 100)
+
+answerC <- simulationsReshaped %>%
+  filter(Busted == "Bust") %>% # only include simulations where the player Busted
+  summarise(finalAnswer = mean(Hand))
+
+# Answering questions d and e requires a little different data (i.e., the entire bankroll history for each hand) which is ridiculously large 
+# I would like to learn the most efficiency way to do this in the future please!!!
+answerD <- unlist(simulations[3,][100]) # should pull out the bankroll (3) and [100] specifies only the 100th element of each bankroll
+answerD[is.na(answerD)] <- 0 # convert NA (which means they busted) to 0 to calculate mean & var
+
+mean(answerD)
+sd(answerD)
+
+answerE <- unlist(simulations[3,][500]) # should pull out the bankroll (3) and [100] specifies only the 100th element of each bankroll
+answerE[is.na(answerE)] <- 0 # convert NA (which means they busted) to 0 to calculate mean & var
+
+mean(answerE)
+sd(answerE)
+```
 
 2. **Markov Chains**. Suppose you have a game where the probability of winning on your first hand is 48%; each time you win, that probability goes up by one percentage point for the next game (to a maximum of 100%, where it must stay), and each time you lose, it goes back down to 48%. Assume you cannot go bust and that the size of your wager is a constant $100.
     a. Is this a fair game? Simulate one hundred thousand sequential hands to determine the size of your return. Then repeat this simulation 99 more times to get a range of values to calculate the expectation.
