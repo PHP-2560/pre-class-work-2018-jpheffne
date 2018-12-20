@@ -124,3 +124,42 @@ sd(answerE)
     a. Is this a fair game? Simulate one hundred thousand sequential hands to determine the size of your return. Then repeat this simulation 99 more times to get a range of values to calculate the expectation.
     b. Repeat this process but change the starting probability to a new value within 2% either way. Get the expected return after 100 repetitions. Keep exploring until you have a return value that is as fair as you can make it. Can you do this automatically?
     c. Repeat again, keeping the initial probability at 48%, but this time change the probability increment to a value different from 1%. Get the expected return after 100 repetitions. Keep changing this value until you have a return value that is as fair as you can make it. 
+    
+``` {r echo = TRUE}
+
+initalProbWin <- .48 # inital probability of winning
+probIncrement <- .01 # change in probability of winning after getting a win
+initalBankroll <- 1000 # starting $
+bet <- 100 # how much you bet each trial
+numTrials <- 100000 # 100,000 trials 
+
+bankrollHistory <- rep(NA, numTrials)
+bankrollHistory[1] <- initalBankroll
+
+probTrial <- rep(NA, numTrials)
+probTrial[1] <- initalProbWin
+
+for (i in 1:numTrials) { # i is the "hand" the game is on (first, second, etc.)
+  # Markov chain
+  trialSuccess <- rbinom(1, 1, probTrial[i])
+  
+  
+  
+  
+      
+      
+      
+      # Have our player play the hand with a 50% probability of winning 
+      trialSuccess <- rbinom(1, 1, p = pSuccess) # I want to sample 1 pull 1 time, with a probability of 50% of a 1 or 0
+      
+      if (trialSuccess == 1) { # won!
+        bankrollHistory[i+1] <- bankrollHistory[i] + bet 
+      } else { # lost
+        bankrollHistory[i+1] <- bankrollHistory[i] - bet
+      }
+    }
+  }
+
+
+```
+    
